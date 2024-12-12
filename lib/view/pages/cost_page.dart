@@ -24,14 +24,14 @@ class _CostPageState extends State<CostPage> {
   final berat = TextEditingController();
   bool isLoading = false;
 
-  String rupiahMoneyFormatter(int? value) {
+  String formatuang(int? value) {
     if (value == null) return "Rp0,00";
-    final formatter = NumberFormat.currency(
+    final formatuanga = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp',
       decimalDigits: 2,
     );
-    return formatter.format(value);
+    return formatuanga.format(value);
   }
 
   @override
@@ -49,7 +49,7 @@ class _CostPageState extends State<CostPage> {
             Container(
               height: double.infinity,
               width: double.infinity,
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(0.0),
               child: Column(
                 children: [
                   Flexible(
@@ -179,8 +179,9 @@ class _CostPageState extends State<CostPage> {
                                     builder: (context, value, _) {
                                       switch (value.CityListOrigin.status) {
                                         case Status.loading:
-                                          return const Text(
-                                              "Select a province first");
+                                          return const Center(
+                                            child: CircularProgressIndicator(),
+                                          );
                                         case Status.error:
                                           return Text(value
                                               .CityListOrigin.message
@@ -296,8 +297,9 @@ class _CostPageState extends State<CostPage> {
                                       switch (
                                           value.CityListDestination.status) {
                                         case Status.loading:
-                                          return const Text(
-                                              "Select a province first");
+                                          return const Center(
+                                            child: CircularProgressIndicator(),
+                                          );
                                         case Status.error:
                                           return Text(value
                                               .CityListDestination.message
@@ -347,9 +349,24 @@ class _CostPageState extends State<CostPage> {
                                       selectedCity2 != null &&
                                       berat.text != "" &&
                                       selectedCourier != "") {
-                                    setState(() {
-                                      isLoading = true; // Show loading overlay
-                                    });
+                                    setState(() {});
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: const Text(
+                                            "checking all costs"),
+                                        content: const Text(
+                                            "checking all costs please wait"),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                    
                                     homeViewModel
                                         .getCostList(
                                             selectedCity.cityId.toString(),
@@ -357,10 +374,7 @@ class _CostPageState extends State<CostPage> {
                                             int.parse(berat.text),
                                             selectedCourier.toString())
                                         .then((_) {
-                                      setState(() {
-                                        isLoading =
-                                            false; // Hide loading overlay
-                                      });
+                                      setState(() {});
                                     });
                                   } else {
                                     showDialog(
@@ -388,7 +402,7 @@ class _CostPageState extends State<CostPage> {
                                     borderRadius: BorderRadius.circular(3.0),
                                   ),
                                 ),
-                                child: const Text('Hitung Estimasi Harga'),
+                                child: const Text('Calculate shipping cost'),
                               ),
                             ),
                           ],
@@ -402,7 +416,7 @@ class _CostPageState extends State<CostPage> {
                       visible: !isLoading,
                       child: Consumer<HomeViewmodel>(
                         builder: (context, value, _) {
-                          if (value.CostList.status == Status.error) {
+                          if (value.CostList.status == Status.loading) {
                             return Align(
                               alignment: Alignment.center,
                               child: Text(
@@ -412,7 +426,7 @@ class _CostPageState extends State<CostPage> {
                                     fontSize: 16, color: Colors.black),
                               ),
                             );
-                          } else if (value.CostList.status == Status.loading) {
+                          } else if (value.CostList.status == Status.error) {
                             return Align(
                               alignment: Alignment.center,
                               child: Text(value.CostList.message.toString()),
@@ -420,6 +434,7 @@ class _CostPageState extends State<CostPage> {
                           } else if (value.CostList.status ==
                               Status.completed) {
                             final costs = value.CostList.data;
+                           
 
                             if (costs != null && costs.isNotEmpty) {
                               return SingleChildScrollView(
@@ -447,7 +462,7 @@ class _CostPageState extends State<CostPage> {
                                               Text(
                                                   style: TextStyle(
                                                       color: Colors.grey),
-                                                  "Biaya: ${rupiahMoneyFormatter(a_costs.cost![0].value ?? 0)}"),
+                                                  "Biaya: ${formatuang(a_costs.cost![0].value ?? 0)}"),
                                               SizedBox(height: 4),
                                               Text(
                                                   style: TextStyle(
@@ -464,6 +479,7 @@ class _CostPageState extends State<CostPage> {
                                   }).toList(),
                                 ),
                               );
+
                             } else {
                               // Handle empty costs
                               return Align(

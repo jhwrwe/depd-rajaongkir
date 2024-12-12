@@ -1,5 +1,6 @@
 import 'package:depd_2024_mvvm/view/pages/pages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 void main() {
   runApp(const MyApp());

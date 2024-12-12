@@ -6,13 +6,29 @@ import 'package:depd_2024_mvvm/repository/home_repository.dart';
 import 'package:flutter/material.dart';
 
 class HomeViewmodel with ChangeNotifier {
+
   final _homeRepo = HomeRepository();
+
+
+  bool _isLoading = false;
+
+  bool get isLoading => _isLoading;
+
+  void setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners(); // Notify widgets to rebuild
+  }
+
+  
+
   ApiResponse<List<Province>> provincelist = ApiResponse.loading();
 
   setProvinceList(ApiResponse<List<Province>> response) {
     provincelist = response;
     notifyListeners();
   }
+
+   
 
   Future<dynamic> getProvinceList() async {
     setProvinceList(ApiResponse.loading());
@@ -66,7 +82,6 @@ class HomeViewmodel with ChangeNotifier {
       String origin, String destination, int weight, String courier) async {
     setCostList(ApiResponse.loading());
     _homeRepo.fetchCostList(origin, destination, weight, courier).then((value) {
-      
       setCostList(ApiResponse.completed(value));
     }).onError((error, stackTrace) {
       setCostList(ApiResponse.error(error.toString()));

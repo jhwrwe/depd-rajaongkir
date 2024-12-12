@@ -5,6 +5,7 @@ import 'package:depd_2024_mvvm/viewmodel/home_viewmodel.dart';
 import 'package:double_back_to_close/double_back_to_close.dart';
 import 'package:double_back_to_close/toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
