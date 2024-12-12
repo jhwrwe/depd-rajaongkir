@@ -4,4 +4,3 @@ import 'package:depd_2024_mvvm/model/model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 part 'card_province.dart';
-part 'card_cost.dart';

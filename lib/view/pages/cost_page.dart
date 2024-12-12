@@ -22,7 +22,17 @@ class _CostPageState extends State<CostPage> {
   dynamic selectedProvince2;
   dynamic selectedCity2;
   final berat = TextEditingController();
-  bool isLoading = false; // Flag to manage loading state
+  bool isLoading = false;
+
+  String rupiahMoneyFormatter(int? value) {
+    if (value == null) return "Rp0,00";
+    final formatter = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp',
+      decimalDigits: 2,
+    );
+    return formatter.format(value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +46,6 @@ class _CostPageState extends State<CostPage> {
         create: (context) => homeViewModel,
         child: Stack(
           children: [
-            // Main UI content
             Container(
               height: double.infinity,
               width: double.infinity,
@@ -44,7 +53,7 @@ class _CostPageState extends State<CostPage> {
               child: Column(
                 children: [
                   Flexible(
-                    flex: 1,
+                    flex: 3,
                     child: Card(
                       color: Colors.white,
                       elevation: 2,
@@ -54,7 +63,6 @@ class _CostPageState extends State<CostPage> {
                           children: [
                             Row(
                               children: [
-                                // Courier Dropdown
                                 Expanded(
                                   flex: 1,
                                   child: DropdownButton<String>(
@@ -65,7 +73,7 @@ class _CostPageState extends State<CostPage> {
                                     iconSize: 30,
                                     elevation: 2,
                                     style: const TextStyle(color: Colors.black),
-                                    items: ['jne', 'Lion', 'Tiki', 'SiCepat']
+                                    items: ['jne', 'pos', 'tiki']
                                         .map<DropdownMenuItem<String>>(
                                             (String value) {
                                       return DropdownMenuItem<String>(
@@ -86,8 +94,7 @@ class _CostPageState extends State<CostPage> {
                                   child: TextField(
                                     controller: berat,
                                     decoration: const InputDecoration(
-                                      labelText: 'Berat (kg)',
-                                      border: OutlineInputBorder(),
+                                      labelText: 'Berat (gr)',
                                     ),
                                     keyboardType: TextInputType.number,
                                     onChanged: (value) {
@@ -102,18 +109,21 @@ class _CostPageState extends State<CostPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Text(
-                                  "Origin",
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.black,
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Text(
+                                    "Origin",
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                            // Origin Province and City Dropdowns
                             Row(
                               children: [
                                 Expanded(
@@ -213,18 +223,21 @@ class _CostPageState extends State<CostPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Text(
-                                  "Destination",
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.black,
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Text(
+                                    "Destination",
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                            // Destination Province and City Dropdowns
                             Row(
                               children: [
                                 Expanded(
@@ -325,87 +338,146 @@ class _CostPageState extends State<CostPage> {
                               ],
                             ),
                             const Divider(height: 9),
-                            ElevatedButton(
-                              onPressed: () {
-                                if (selectedCity != null &&
-                                    selectedCity2 != null &&
-                                    berat.text != "" &&
-                                    selectedCourier != "") {
-                                  setState(() {
-                                    isLoading = true; // Show loading overlay
-                                  });
-                                  homeViewModel
-                                      .getCostList(
-                                          selectedCity.cityId.toString(),
-                                          selectedCity2.cityId.toString(),
-                                          int.parse(berat.text),
-                                          selectedCourier.toString())
-                                      .then((_) {
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 6.0),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (selectedCity != null &&
+                                      selectedCity2 != null &&
+                                      berat.text != "" &&
+                                      selectedCourier != "") {
                                     setState(() {
-                                      isLoading = false; // Hide loading overlay
+                                      isLoading = true; // Show loading overlay
                                     });
-                                  });
-                                } else {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text(
-                                          "Please Complete All Fields"),
-                                      content: const Text(
-                                          "All fields are required to proceed."),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: const Text('OK'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                              },
-                              child: const Text('Calculate Cost'),
-                            )
+                                    homeViewModel
+                                        .getCostList(
+                                            selectedCity.cityId.toString(),
+                                            selectedCity2.cityId.toString(),
+                                            int.parse(berat.text),
+                                            selectedCourier.toString())
+                                        .then((_) {
+                                      setState(() {
+                                        isLoading =
+                                            false; // Hide loading overlay
+                                      });
+                                    });
+                                  } else {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: const Text(
+                                            "Please Complete All Fields"),
+                                        content: const Text(
+                                            "All fields are required to proceed."),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(3.0),
+                                  ),
+                                ),
+                                child: const Text('Hitung Estimasi Harga'),
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  const Divider(),
                   Expanded(
-                    flex: 1,
+                    flex: 2,
                     child: Visibility(
                       visible: !isLoading,
                       child: Consumer<HomeViewmodel>(
                         builder: (context, value, _) {
-                          switch (value.CostList.status) {
-                            case Status.loading:
+                          if (value.CostList.status == Status.error) {
+                            return Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "There is no data",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.black),
+                              ),
+                            );
+                          } else if (value.CostList.status == Status.loading) {
+                            return Align(
+                              alignment: Alignment.center,
+                              child: Text(value.CostList.message.toString()),
+                            );
+                          } else if (value.CostList.status ==
+                              Status.completed) {
+                            final costs = value.CostList.data;
+
+                            if (costs != null && costs.isNotEmpty) {
+                              return SingleChildScrollView(
+                                child: Column(
+                                  children: costs.map((a_costs) {
+                                    return Card(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12)),
+                                      margin: EdgeInsetsDirectional.symmetric(
+                                          vertical: 6, horizontal: 16),
+                                      color: Colors.white,
+                                      elevation: 4,
+                                      shadowColor: Colors.black.withOpacity(1),
+                                      child: ListTile(
+                                          title: Text(
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold),
+                                              "${a_costs.description} (${a_costs.service})"),
+                                          subtitle: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                  style: TextStyle(
+                                                      color: Colors.grey),
+                                                  "Biaya: ${rupiahMoneyFormatter(a_costs.cost![0].value ?? 0)}"),
+                                              SizedBox(height: 4),
+                                              Text(
+                                                  style: TextStyle(
+                                                      color: Colors.green),
+                                                  "Estimasi sampai: ${a_costs.cost![0].etd ?? ''} hari"),
+                                            ],
+                                          ),
+                                          leading: CircleAvatar(
+                                            backgroundColor: Colors.blue,
+                                            child: Icon(Icons.local_shipping,
+                                                color: Colors.white),
+                                          )),
+                                    );
+                                  }).toList(),
+                                ),
+                              );
+                            } else {
+                              // Handle empty costs
                               return Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "There is no data",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 16, color: Colors.black),
-                                  ));
-                            case Status.error:
-                              return Align(
-                                  alignment: Alignment.center,
-                                  child:
-                                      Text(value.CostList.message.toString()));
-                            case Status.completed:
-                              return Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 8.0, bottom: 8.0),
-                                  child: ListView.builder(
-                                    itemCount: value.CostList.data?.length ?? 0,
-                                    itemBuilder: (context, index) {
-                                      return CardCost(value.CostList.data!
-                                          .elementAt(index));
-                                    },
-                                  ));
-                            default:
-                              return Container();
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "No cost data available",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.black),
+                                ),
+                              );
+                            }
+                          } else {
+                            return Container();
                           }
                           ;
                         },
@@ -415,7 +487,6 @@ class _CostPageState extends State<CostPage> {
                 ],
               ),
             ),
-
             if (isLoading)
               Container(
                 color: Colors.black.withOpacity(0.5),
